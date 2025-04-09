@@ -26,3 +26,12 @@ Básicamente la arquitectura principal independientemente del middleware utiliza
 ## Implementación XMLRPC
 En este caso para el broadcaster no 'se publican en un canal' sino que obtiene los insultos y los hace disponibles para los clientes, como flujo de información. 
 El receiver lo que hace es solicitar los insultos de forma periodica al broadcaster.
+
+# InsultFiltter
+
+////todo
+
+## Implemenatcion XMLRPC
+En este caso tenemos dos productores, uno que manda texto sin insultos y otro que manda texto con insultos. 
+Entonces, estos se conectan al mismo servidor, que es el consumidor, y según si la frase lleva alguna palabara que esta etiquetada con insultos, los cambia por CENSORED, y los guarda en la lista de frases limpias, i si no tiene insultos simplemente los guarda en la lista. 
+ 
