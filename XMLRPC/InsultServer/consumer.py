@@ -1,4 +1,5 @@
 # insult_server_xmlrpc.py
+import random
 from xmlrpc.server import SimpleXMLRPCServer
 
 # Clase para gestionar insultos
@@ -22,7 +23,7 @@ class InsultServer:
     def insult_me(self):
         if self.insults:
             return random.choice(self.insults)
-        return "You're safe... for now."
+        return "No hay insultos disponibles."
 
     def get_new_insults(self):
         # Devuelve los insultos que aún no han sido "broadcasted"
@@ -36,7 +37,7 @@ server = SimpleXMLRPCServer(("localhost", 9000), allow_none=True)
 server.register_introspection_functions()
 
 # Registrar el servicio
-service = InsultService()
+service = InsultServer()
 server.register_instance(service)
 
 
