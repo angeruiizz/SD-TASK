@@ -31,10 +31,13 @@ class Observable(object):
             print("Notified observer:", observer)
     
 
-daemon = Pyro4.Daemon() # Crear un servidor Pyro4
-uri = daemon.register(Observable) # Registrar el objeto observable
-ns = Pyro4.locateNS() # Localizar el Name Server
-ns.register("example.observable", uri) # Registrar el objeto observable en el Name Server
-print("Server is ready.")
-daemon.requestLoop() # Esperar en un loop para recibir notificaciones
-    
+def main():
+    daemon = Pyro4.Daemon()
+    ns = Pyro4.locateNS()
+    uri = daemon.register(InsultService)
+    ns.register("example.insultservice", uri)
+    print("InsultService corriendo...")
+    daemon.requestLoop()
+
+if __name__ == "__main__":
+    main()
