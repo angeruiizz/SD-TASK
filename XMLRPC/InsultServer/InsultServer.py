@@ -6,7 +6,6 @@ import time
 scripts = {
     "Server": "consumer.py",
     "Producer": "producer.py",
-    "Broadcaster": "broadcaster.py",
     "Receiver": "receiver.py"
 }
 

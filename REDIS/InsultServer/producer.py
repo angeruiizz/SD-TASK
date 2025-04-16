@@ -1,19 +1,17 @@
-# Genera insultos y los envia a la cola bloquenate cada 5 seg
-
+# producer.py
 import redis
 import time
 import random
 
-# Connect to Redis
 client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
-
 queue_name = "INSULTS_queue"
 
-# Send multiple messages
-INSULTS = ["Tonto", "Cap de suro", "Inutil","BocaChancla"]
+INSULTS = ["Tonto", "Cap de suro", "Inútil", "BocaChancla"]
+
+print("Producer started...")
 
 while True:
-    insult = random.choice(INSULTS)  # Selecciona un insulto aleatorio
+    insult = random.choice(INSULTS)
     client.rpush(queue_name, insult)
-    print(f"Produced: {insult}")
-    time.sleep(5)  # Espera 5 segundos entre cada envío
+    print(f"Produced insult: {insult}")
+    time.sleep(5)

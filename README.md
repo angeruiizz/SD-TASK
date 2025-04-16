@@ -14,18 +14,30 @@ Una vez que el servidor ha procesado la solicitud, genera una respuesta en forma
 
 
 # InsultServer
-Esta primera parte tarta de implementar un Servidor de insultos. Este puede recibir insultos de forma remota y guardarlos en una lista si son nuevos. El servicio ofrece kmecanismos para tratar con lña lista de los insultos. Un broadcaster peridoicamente publica insultos random para los susbcriptores que estan en el canal cada 5 seg. 
+Esta primera parte tarta de implementar un Servidor de insultos. Este puede recibir insultos de forma remota y guardarlos en una lista si son nuevos. El servicio ofrece kmecanismos para tratar con lña lista de los insultos.
 
 Básicamente la arquitectura principal independientemente del middleware utilizado (según la imoplementación, ver mas adelante):
-- InsultServer.py -> Con este script se pueden ejecutar los 4 scripts.
-- Consumer.py -> Este script simula el servidor, estan definidos los metodos para getsionar los insutlos
+- execInsultServer.py -> Con este script se pueden ejecutar los 3 scripts.
+- observable.py -> Este script simula el servidor, estan definidos los metodos para getsionar los insutlos
 - Producer.py -> Este script simula el cliente, que manda insultos de forma aleatoria al servidor
-- broadcaster.py -> Este script recoje los insultos y los publica en un canal 
-- Receiver.py -> Cliente conectado en el canal que recibe los insultos.
+- observer.py -> Cliente conectado en el canal que recibe los insultos.
 
 ## Implementación XMLRPC
 En este caso para el broadcaster no 'se publican en un canal' sino que obtiene los insultos y los hace disponibles para los clientes, como flujo de información. 
-El receiver lo que hace es solicitar los insultos de forma periodica al broadcaster.
+Cuando devuelve:
+127.0.0.1 - - [16/Apr/2025 21:54:32] "POST / HTTP/1.1" 200 -
+127.0.0.1 - - [16/Apr/2025 21:54:33] "POST / HTTP/1.1" 200 -
+Significa que el servidor recibio la petición post desde la ip 127.0.0.1 y que la petición fue correcta (200). (POST es el método de la petición, y HTTP/1.1 es la versión del protocolo HTTP que se está utilizando).
+
+## Implementación PyRO
+En este caso, el servidor de insultos se convierte en un objeto remoto que puede ser accedido por los clientes a través de Pyro. El cliente se conecta al servidor Pyro y llama a los métodos del objeto remoto como si fueran métodos locales. Pyro maneja la comunicación entre el cliente y el servidor, permitiendo que los clientes interactúen con el servidor de insultos de manera transparente.
+
+## Implementación Redis
+En este caso, el servidor de insultos se convierte en un productor que publica mensajes en un canal de Redis. Los clientes se suscriben a ese canal y reciben los mensajes publicados por el servidor. Redis maneja la comunicación entre el productor y los consumidores, permitiendo que los clientes reciban los insultos en tiempo real.
+
+## Implementación RabbitMQ
+
+
 
 # InsultFiltter
 

@@ -12,9 +12,9 @@ def main():
 
     daemon = Pyro4.Daemon()
     observer = Observer()
-    observer_uri = daemon.register(observer)
-
-    insult_service.register(observer_uri)
+    observer_uri = daemon.register(observer) # Registrar el observer en el daemon
+    insult_service.register(observer_uri) # Registrar el observer en el servicio de insultos
+    
     print(f"Observer registrado y esperando insultos...")
     daemon.requestLoop()
 

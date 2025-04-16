@@ -1,0 +1,54 @@
+1. Producer/Consumer (Cola Bloqueante)
+Este modelo está basado en una cola bloqueante, donde el productor envía datos a una cola y el consumidor los consume.
+
+Características:
+Productor: Genera y envía datos a la cola (en tu caso, los insultos). Los datos se almacenan en la cola y permanecen allí hasta que son consumidos.
+Consumidor: Toma los datos de la cola, los procesa y, si es necesario, los elimina. Puede consumir los datos de forma secuencial, uno a uno, esperando hasta que haya datos disponibles en la cola.
+Ventajas:
+Cola de trabajo: Los consumidores pueden procesar los datos cuando estén listos, es decir, en un modelo asincrónico. La cola permite que el productor y el consumidor trabajen a diferentes velocidades.
+Bloqueo: Si la cola está vacía, el consumidor se bloquea (espera) hasta que haya datos disponibles.
+Ejemplo en tu código:
+Producer: Envía insultos a la cola de Redis (INSULTS_queue).
+Consumer: Extrae los insultos de la cola y los guarda en la lista INSULTS si son nuevos.
+
+2. Broadcaster/Receiver (Pub/Sub)
+Este modelo está basado en publicación y suscripción (Pub/Sub), donde los datos no se almacenan en una cola, sino que se publican en un canal y cualquier número de suscriptores puede recibir los datos de forma simultánea.
+
+Características:
+Broadcaster: Publica datos en un canal de Redis. Los datos no se almacenan, solo se envían a los suscriptores en tiempo real.
+Receiver: Se suscribe a un canal y recibe los mensajes (insultos) a medida que el broadcaster los publica.
+Ventajas:
+Transmisión en tiempo real: Los datos se envían inmediatamente a todos los suscriptores sin necesidad de almacenarlos (aunque también puedes almacenar los datos si lo deseas).
+Multicast: Varios suscriptores pueden recibir el mismo mensaje simultáneamente. Ideal para escenarios donde múltiples servicios necesitan recibir los mismos datos.
+Ejemplo en tu código:
+InsultBroadcaster: Publica los insultos desde la lista INSULTS en un canal INSULTS_channel.
+InsultReceiver: Se suscribe al canal INSULTS_channel y recibe los insultos en tiempo real.
+
+¿Cómo funciona el Producer/Consumer con varios consumidores?
+El productor (Producer) envía mensajes a la cola.
+Los consumidores (Consumers) esperan a que haya mensajes en la cola.
+Cuando hay varios consumidores, cada uno de ellos recibe un mensaje diferente de la cola.
+Es decir, cada mensaje solo se procesa una vez por un solo consumidor.
+Si hay múltiples consumidores, los mensajes se distribuyen entre ellos (de forma balanceada). Cada consumidor saca un mensaje de la cola y lo procesa.
+Ejemplo:
+Imagina que el Producer pone 10 insultos en la cola.
+Si tienes 3 Consumers, los 10 insultos se dividen entre ellos. Por ejemplo, uno de los consumidores puede obtener 4 insultos y el otro 3, y así sucesivamente.
+Cada consumidor procesa un mensaje por separado y una sola vez. Si un consumidor ya ha procesado un insulto, nadie más lo procesará.
+
+En el modelo Producer/Consumer, los consumidores no reciben todos los mensajes. Cada mensaje es entregado únicamente a un consumidor (a uno de los consumidores disponibles).
+
+¿Cómo funciona el Producer/Consumer con varios consumidores?
+El productor (Producer) envía mensajes a la cola.
+Los consumidores (Consumers) esperan a que haya mensajes en la cola.
+Cuando hay varios consumidores, cada uno de ellos recibe un mensaje diferente de la cola.
+Es decir, cada mensaje solo se procesa una vez por un solo consumidor.
+Si hay múltiples consumidores, los mensajes se distribuyen entre ellos (de forma balanceada). Cada consumidor saca un mensaje de la cola y lo procesa.
+Ejemplo:
+Ejemplo:
+
+Imagina que el Producer pone 10 insultos en la cola.
+Si tienes 3 Consumers, los 10 insultos se dividen entre ellos. Por ejemplo, uno de los consumidores puede obtener 4 insultos y el otro 3, y así sucesivamente.
+Cada consumidor procesa un mensaje por separado y una sola vez. Si un consumidor ya ha procesado un insulto, nadie más lo procesará.
+Diferencia clave:
+En el modelo Producer/Consumer, los consumidores no reciben todos los mensajes. Cada mensaje es entregado únicamente a un consumidor (a uno de los consumidores disponibles).
+Los consumidores comparten el trabajo. Si tienes 10 mensajes en la cola y 3 consumidores, los consumidores se reparten el trabajo procesando cada mensaje solo una vez.
