@@ -5,45 +5,55 @@ En el caso del XMLRCP, permite que un cliente llame a la función de un servidor
 El servidor, al recibir la solicitud XML, la procesa y ejecuta el método solicitado. El servidor tiene que estar preparado para recibir y entender los mensajes XML y ejecutar las funciones que el cliente le pida.
 Una vez que el servidor ha procesado la solicitud, genera una respuesta en formato XML, que incluye el resultado de la ejecución del método.  El cliente recibe la respuesta del servidor, procesa la información y continúa con su ejecución.
 
+### InsultServer
+
+### InsultFilter
+
 
 ## PyRO
 
+### InsultServer
+
+### InsultFilter
+
 ## REDIS
 
+### InsultServer
+
+### InsultFilter
+
 ## RabbitMQ
+En el caso de RabbitMQ, se tarta de un servicio de comunicación indirecta. Se basa en el modelo publisher-subscriber, donde los productores envían mensajes a un intercambio (exchange) y los consumidores se suscriben a colas (queues) que reciben esos mensajes. RabbitMQ se encarga de enrutar los mensajes desde el productor hasta el consumidor adecuado, permitiendo una comunicación asíncrona y desacoplada entre ellos.
+RabbitMQ utiliza el protocolo AMQP (Advanced Message Queuing Protocol) para la comunicación entre productores y consumidores. Los mensajes se envían a través de un intercambio, que actúa como un intermediario entre los productores y las colas. Los consumidores se suscriben a las colas y reciben los mensajes que se envían a esas colas.
 
+### InsultServer
+En este caso, al ser RabbitMQ un servicio de mensajería, el servidor InsultServer actúa como un productor de mensajes. En lugar de enviar respuestas directamente al cliente, el servidor envía mensajes a una cola de RabbitMQ. El cliente se suscribe a esa cola y recibe los mensajes que el servidor envía. Esto permite una comunicación asíncrona y desacoplada entre el servidor y el cliente.
+Por tanto tenemos:
+- El insultProducer -> cada 5 seg genera un insulto aleatorio y lo envía a la cola de RabbitMQ. Tipo de comunicación es point-to-point.
+- El insultConsumer -> se suscribe a la cola de RabbitMQ y recibe los insultos que el productor envía. Tipo de comunicación es point-to-point.Podemos hacer load balancing entre varios consumidores, ya que cada uno de ellos se suscribe a la misma cola y RabbitMQ se encarga de distribuir los mensajes entre ellos. 
+- El insultBroadcast -> Cada 5 seg, coje un insulto y lo publica para que cualquiera que este suscrito lo reciba. Tipo de comunicación es publish-subscribe.
+- El insultSubscriber -> se suscribe a un fannout exchange de RabbitMQ y recibe los mensajes que se publican en ese exchange. Tipo de comunicación es publish-subscribe.
 
-# InsultServer
-Esta primera parte tarta de implementar un Servidor de insultos. Este puede recibir insultos de forma remota y guardarlos en una lista si son nuevos. El servicio ofrece kmecanismos para tratar con lña lista de los insultos.
+*El exchange se encarga de enrutar los mensajes a las colas adecuadas. Puede ser: direct, topic o fanout. En este caso, se utiliza un exchange de tipo fanout, que envía los mensajes a todas las colas suscritas a él. Direcrt: envía los mensajes a una cola específica. Topic: envía los mensajes a las colas que coinciden con un patrón de enrutamiento.
 
-Básicamente la arquitectura principal independientemente del middleware utilizado (según la imoplementación, ver mas adelante):
-- execInsultServer.py -> Con este script se pueden ejecutar los 3 scripts.
-- observable.py -> Este script simula el servidor, estan definidos los metodos para getsionar los insutlos
-- Producer.py -> Este script simula el cliente, que manda insultos de forma aleatoria al servidor
-- observer.py -> Cliente conectado en el canal que recibe los insultos.
+tutorial publicación y suscripción: https://www.rabbitmq.com/tutorials/tutorial-three-python
 
-## Implementación XMLRPC
-En este caso para el broadcaster no 'se publican en un canal' sino que obtiene los insultos y los hace disponibles para los clientes, como flujo de información. 
-Cuando devuelve:
-127.0.0.1 - - [16/Apr/2025 21:54:32] "POST / HTTP/1.1" 200 -
-127.0.0.1 - - [16/Apr/2025 21:54:33] "POST / HTTP/1.1" 200 -
-Significa que el servidor recibio la petición post desde la ip 127.0.0.1 y que la petición fue correcta (200). (POST es el método de la petición, y HTTP/1.1 es la versión del protocolo HTTP que se está utilizando).
+tutorial colas: https://www.rabbitmq.com/tutorials/tutorial-two-python
 
-## Implementación PyRO
-En este caso, el servidor de insultos se convierte en un objeto remoto que puede ser accedido por los clientes a través de Pyro. El cliente se conecta al servidor Pyro y llama a los métodos del objeto remoto como si fueran métodos locales. Pyro maneja la comunicación entre el cliente y el servidor, permitiendo que los clientes interactúen con el servidor de insultos de manera transparente.
+![alt text](imagenes-README/publishsubsRABBITMQ.png "RabbitMQ publish-subscribe")
 
-## Implementación Redis
-En este caso, el servidor de insultos se convierte en un productor que publica mensajes en un canal de Redis. Los clientes se suscriben a ese canal y reciben los mensajes publicados por el servidor. Redis maneja la comunicación entre el productor y los consumidores, permitiendo que los clientes reciban los insultos en tiempo real.
+**Para ejecutar simplemente ejecutar en la terminal el siguiente comando dentro de la ruta del insultServer (RabbitMQ/InsultServer)**
+```bash
+ python .\execInsultServer.py
+```
 
-## Implementación RabbitMQ
+### InsultFilter
+El Insult Filtter sigue la estructura de WorkQueue, donde el productor envía mensajes a una cola y los consumidores se suscriben a esa cola para recibir los mensajes. En este caso, el insultFilter actúa como un consumidor de mensajes que recibe insultos del servidor y los procesa.
+Código del InsultFilter:
+- insultConsumer.py: Cuando el cliente recibe una frase lo decodifica y lo limpia.
+- insultProducer.py: Se encarga de enviar frases con y sin insultos a la cola de RabbitMQ
 
-
-
-# InsultFiltter
-
-////todo
-
-## Implemenatcion XMLRPC
-En este caso tenemos dos productores, uno que manda texto sin insultos y otro que manda texto con insultos. 
-Entonces, estos se conectan al mismo servidor, que es el consumidor, y según si la frase lleva alguna palabara que esta etiquetada con insultos, los cambia por CENSORED, y los guarda en la lista de frases limpias, i si no tiene insultos simplemente los guarda en la lista. 
- 
+**Para ejecutar simplemente ejecutar en la terminal el siguiente comando dentro de la ruta del insultServer (RabbitMQ/InsultFiltter)**
+```bash
+ python .\execInsultFilter.py
+```
