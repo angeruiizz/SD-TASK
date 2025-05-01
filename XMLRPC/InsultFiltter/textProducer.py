@@ -5,7 +5,7 @@ import random
 # Conectar al servidor XML-RPC
 server = xmlrpc.client.ServerProxy("http://localhost:9000/") #para conectarse al servidor
 
-
+print("Enviando textos sin insultos al servidor...")
 textos = [
     "Ejemplo text sin insultos.",
     "Todo va bien hoy.",

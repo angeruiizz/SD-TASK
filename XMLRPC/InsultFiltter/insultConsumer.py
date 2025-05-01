@@ -2,7 +2,7 @@ from xmlrpc.server import SimpleXMLRPCServer
 import time
 import random
 
-INSULTS = ["Tonto", "Cap de suro", "Inútil", "BocaChancla", "idiota", "estúpido", "imbécil", "gilipollas"]
+INSULTS = ["Tonto", "cap de suro", "Inútil", "BocaChancla", "idiota", "estúpido", "imbécil", "gilipollas"]
 
 class InsultFiltter:
     def __init__(self):
@@ -18,11 +18,11 @@ class InsultFiltter:
                     cleaned_text = self.clean_text(text)
                     self.textsFilt.append(cleaned_text)
                     print(f"Text contained insults. Filtered: {cleaned_text}")
-                    return f"Filtered text: {cleaned_text}"
+                    return f"Frase enviada: {text}"
                 else:
                     self.textsFilt.append(text)
                     print(f"Clean text added: {text}")
-                    return f"Added clean text: {text}"
+                    return f"Frase enviada: {text}"
             else:
                  if self.contains_insult(text):
                     cleaned_text = self.clean_text(text)

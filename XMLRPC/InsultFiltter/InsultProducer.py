@@ -5,8 +5,7 @@ import random
 # Conectar al servidor XML-RPC
 server = xmlrpc.client.ServerProxy("http://localhost:9000/") #para conectarse al servidor
 
-INSULTS = ["Tonto", "Cap de suro", "Inútil", "BocaChancla"] #insultos que se enviaran al servidorç
-
+print("Enviando textos con insultos al servidor...")
 textos = [
     "Eres un tonto, ¿por qué vas tan lento?",
     "Eres tan estúpido que no se que haces aqui",
