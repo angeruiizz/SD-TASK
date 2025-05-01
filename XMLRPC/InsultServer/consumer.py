@@ -1,12 +1,13 @@
-# consumer.py - observable
+# consumer.py - servidor XML-RPC sin hilos
 import random
+import time
 from xmlrpc.server import SimpleXMLRPCServer
 
-# Clase para gestionar insultos
 class InsultServer:
     def __init__(self):
         self.insults = []
-        self.broadcasted = []
+        self.last_broadcasted = None
+        self.last_broadcast_time = 0  # timestamp
 
     def add_insult(self, insult):
         if insult not in self.insults:
@@ -20,20 +21,24 @@ class InsultServer:
     def get_insults(self):
         return self.insults
 
-    def insult_me(self):
-        if self.insults:
-            return random.choice(self.insults)
-        return "No hay insultos disponibles."
+    def get_last_broadcasted(self):
+        return self.last_broadcasted
 
+    def broadcast(self):
+        """Simula el broadcast cada 5 segundos."""
+        print("Broadcasting...")
+        now = time.time()
+        if now - self.last_broadcast_time >= 5 and self.insults:
+            insult = random.choice(self.insults)
+            self.last_broadcasted = insult
+            self.last_broadcast_time = now
+            print(f"[Broadcasted] {insult}")
+        return self.last_broadcasted
 
-# servidor XML-RPC
 server = SimpleXMLRPCServer(("localhost", 9000), allow_none=True)
 server.register_introspection_functions()
-
-# Registrar el servicio
 service = InsultServer()
 server.register_instance(service)
-
 
 print("Insult XML-RPC Server is running on port 9000...")
 server.serve_forever()

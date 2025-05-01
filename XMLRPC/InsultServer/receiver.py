@@ -1,19 +1,12 @@
-# receiver_xmlrpc.py
+# receiver_xmlrpc.py - suscriptor que llama al broadcast()
 import xmlrpc.client
 import time
 
 server = xmlrpc.client.ServerProxy("http://localhost:9000/")
+print("Receiver listening to broadcasted insults...")
 
-print("Receiver is polling for insults...")
-
-known_insults = set()
 
 while True:
-    all_insults = server.get_insults()
-    new_insults = [i for i in all_insults if i not in known_insults]
-    
-    for insult in new_insults:
-        print(f"Received insult: {insult}")
-        known_insults.add(insult)
-    
-    time.sleep(5)
+    current = server.broadcast() # Llama al método broadcast() del servidor
+    print(f"[Received Broadcast] {current}")
+    time.sleep(1)  # Hace polling cada segundo
