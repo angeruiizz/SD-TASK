@@ -24,8 +24,24 @@ python .\execInsultServer.py
 ```
 
 
-
 ### InsultFilter
+Este servicio se encarga de recibir textos desde clientes XML-RPC y comprobar si contienen insultos. Si detecta insultos, los sustituye por la palabra "CENSORED" y almacena tanto el texto original como el filtrado. El filtro es una lógica simple de Work Queue, donde los productores envían textos y el servidor los procesa uno a uno.
+
+En este modelo, el servidor sigue escuchando continuamente en el puerto 9000 y responde a las solicitudes que recibe. Los clientes actúan como productores, y no existe comunicación directa entre los clientes: todos se comunican únicamente con el servidor.
+Este modelo simula el patrón de procesamiento en cola (work queue), donde varios productores pueden enviar tareas (textos) a un único servidor que las procesa en orden de llegada.
+
+A diferencia del ejemplo anterior de InsultServer, aquí no hay necesidad de que el cliente haga polling continuo ni de simular difusión. Simplemente cada productor envía datos al servidor, que los filtra en tiempo real.
+
+Scripts:
+- insultProducer.py: Se encarga de enviar textos al servidor. Cada 5 segundos envía un texto con insultos aleatorio al servidor para que lo procese.
+- textProducer.py: Se encarga de enviar textos al servidor. Cada 5 segundos envía un texto sin insultos aleatorio al servidor para que lo procese.
+- insultConsumer.py: Se encarga de recibir los textos del servidor y procesarlos. Cuando el servidor recibe un texto, lo filtra y devuelve el texto filtrado al cliente. El cliente imprime el texto original y el filtrado en la consola.
+
+**Para ejecutar todo el servicio, se puede utilizar el siguiente comando en la terminal dentro de la ruta del InsultServer (XMLRPC/InsultFilter):**
+
+```bash 
+python .\execInsultFilter.py
+```
 
 
 ## PyRO

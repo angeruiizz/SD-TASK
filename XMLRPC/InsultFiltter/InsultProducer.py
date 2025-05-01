@@ -12,7 +12,7 @@ textos = [
     "Eres tan estúpido que no se que haces aqui",
     "La gente te considera un imbécil por cómo actúas.",
     "No puedo creer que seas tan idiota.",
-    "Ets un cap de suro"
+    "Ets un cap de suro",
     "Puedes ser mas gilipollas????"
 ]
 
