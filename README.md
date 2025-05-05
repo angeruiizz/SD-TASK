@@ -45,10 +45,27 @@ python .\execInsultFilter.py
 
 
 ## PyRO
+En el caso de Pyro, es una libreria implementada en Python, que permite la comunicación remota entre objetos distribuiidos. Esta orientado a objetos y permite que diferentes maquinas se comuniqeun como si estuvieran en el mismo programa. Además incluye un servicio de nombres qeu permite registarar los objetos. Además, permite mantener el estado e invocar métodos directamente en clientes y servidores.
 
 ### InsultServer
+El servidor central actúa como difusor de insultos. Mantiene una lista de suscriptores (clientes que han registrado su objeto remoto) y, cada 5 segundos, invoca el método receive_insult(insult) en cada uno de ellos, enviando un insulto aleatorio de forma proactiva.
+Este comportamiento implementa una verdadera comunicación de publicación/suscripción (Observer), ya que:
+
+Los clientes no necesitan consultar periódicamente si hay nuevos insultos (polling).
+
+El servidor envía automáticamente los mensajes a todos los clientes suscritos.
+
+Roles:
+- Producer: Genera insultos aleatorios y los difunde a los suscriptores registrados. En este caso, el productor está integrado en el servidor.
+
+- Consumer / Receiver: Son los clientes que se han registrado como observadores. Implementan el método receive_insult, que recibe y muestra el insulto enviado por el servidor.
 
 ### InsultFilter
+Garcias a que el Pyro permite la comunicación directa, hace que el modelo de work queue sea mucho mas facil de implementar.
+
+- TextProducer: Cliente que envía frases sin insultos cada 5 segundos. Ayuda a probar el filtrado cuando no hay contenido ofensivo.
+- AngryProducer: Cliente que envía frases con insultos de forma aleatoria. Permite probar la efectividad del filtro.
+- InsultFilter (servidor): Recibe todas las frases de ambos productores, detecta insultos y guarda la versión limpia. Todos los textos filtrados se pueden recuperar mediante el método get_results.
 
 ## REDIS
 
