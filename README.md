@@ -43,7 +43,6 @@ Scripts:
 python .\execInsultFilter.py
 ```
 
-
 ## PyRO
 En el caso de Pyro, es una libreria implementada en Python, que permite la comunicación remota entre objetos distribuiidos. Esta orientado a objetos y permite que diferentes maquinas se comuniqeun como si estuvieran en el mismo programa. Además incluye un servicio de nombres qeu permite registarar los objetos. Además, permite mantener el estado e invocar métodos directamente en clientes y servidores.
 

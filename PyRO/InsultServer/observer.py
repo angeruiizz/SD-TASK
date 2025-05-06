@@ -2,6 +2,7 @@ import Pyro4
 
 @Pyro4.expose
 @Pyro4.behavior(instance_mode="single")
+
 class Observer:
     def update(self, message):
         print(f"Insulto recibido: {message}")

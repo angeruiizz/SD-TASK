@@ -1,7 +1,5 @@
-# insult_service.py
 import Pyro4
 import random
-import threading
 import time
 
 @Pyro4.expose
@@ -10,6 +8,7 @@ class InsultService(object):
     def __init__(self):
         self.insults = []
         self.observers = []
+        self.last_broadcast = time.time()
 
     def add_insult(self, insult):
         if insult not in self.insults:
@@ -17,7 +16,6 @@ class InsultService(object):
             print(f"Insulto añadido: {insult}")
             return True
         else:
-            print(f"El insulto '{insult}' ya existe.")
             return False
 
     def get_insults(self): 
@@ -26,9 +24,10 @@ class InsultService(object):
     def register(self, observer):
         if observer not in self.observers:
             self.observers.append(observer)
-            print("Se ha registrado un nuevo observer", observer) 
+            print("Se ha registrado un nuevo observer", observer)
 
     def notify_random_insult(self):
+        print("Broadcasitng insulto a los observers...")
         if not self.insults:
             return
         insult = random.choice(self.insults)
@@ -39,16 +38,6 @@ class InsultService(object):
             except Exception as e:
                 print("Error al notificar observer:", e)
 
-    def start_broadcasting(self):
-        def broadcast():
-            while True:
-                self.notify_random_insult()
-                time.sleep(5)
-
-        thread = threading.Thread(target=broadcast, daemon=True)
-        thread.start()
-
-
 def main():
     daemon = Pyro4.Daemon()
     ns = Pyro4.locateNS()
@@ -57,8 +46,15 @@ def main():
     ns.register("example.insultservice", uri)
     print("InsultService corriendo...")
 
-    service.start_broadcasting()
-    daemon.requestLoop()
+    # Bucle principal del servidor
+    def loop_condition():
+        now = time.time()
+        if now - service.last_broadcast >= 5.0:
+            service.notify_random_insult()
+            service.last_broadcast = now
+        return True  # Siempre continuar
+
+    daemon.requestLoop(loop_condition)
 
 if __name__ == "__main__":
     main()
