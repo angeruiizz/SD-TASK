@@ -48,16 +48,16 @@ En el caso de Pyro, es una libreria implementada en Python, que permite la comun
 
 ### InsultServer
 El servidor central actúa como difusor de insultos. Mantiene una lista de suscriptores (clientes que han registrado su objeto remoto) y, cada 5 segundos, invoca el método receive_insult(insult) en cada uno de ellos, enviando un insulto aleatorio de forma proactiva.
-Este comportamiento implementa una verdadera comunicación de publicación/suscripción (Observer), ya que:
+Este comportamiento implementa un verdadero modelo de publicación/suscripción (patrón Observer), ya que:
 
 Los clientes no necesitan consultar periódicamente si hay nuevos insultos (polling).
 
 El servidor envía automáticamente los mensajes a todos los clientes suscritos.
 
 Roles:
-- Producer: Genera insultos aleatorios y los difunde a los suscriptores registrados. En este caso, el productor está integrado en el servidor.
 
-- Consumer / Receiver: Son los clientes que se han registrado como observadores. Implementan el método receive_insult, que recibe y muestra el insulto enviado por el servidor.
+- Producer: Genera insultos aleatorios y los difunde a los suscriptores registrados. En este caso, el productor está integrado en el propio servidor.
+- Consumer / Receiver: Son los clientes que se han registrado como observadores. Implementan el método receive_insult, que recibe y muestra los insultos enviados por el servidor.
 
 ### InsultFilter
 Garcias a que el Pyro permite la comunicación directa, hace que el modelo de work queue sea mucho mas facil de implementar.
@@ -67,10 +67,43 @@ Garcias a que el Pyro permite la comunicación directa, hace que el modelo de wo
 - InsultFilter (servidor): Recibe todas las frases de ambos productores, detecta insultos y guarda la versión limpia. Todos los textos filtrados se pueden recuperar mediante el método get_results.
 
 ## REDIS
+Redis (REmote DIctionary Server) es una base de datos en memoria de estructura clave-valor, extremadamente rápida y ligera. Aunque originalmente fue diseñada como sistema de almacenamiento, también permite implementar sistemas de comunicación entre procesos mediante su mecanismo de publicación y suscripción (pub/sub).
+
+Redis no utiliza un protocolo de mensajería estándar como AMQP (usado en RabbitMQ), sino su propio sistema de canales. Los mensajes publicados en un canal se entregan en tiempo real a todos los clientes que estén suscritos en ese momento. Sin embargo, estos mensajes no se almacenan: si no hay suscriptores conectados cuando se publica un mensaje, este se pierde.
+
+Además de pub/sub, Redis proporciona estructuras como SET y LIST que permiten almacenar datos persistentes de manera eficiente y evitar duplicados o mantener el orden de inserción, respectivamente.
+
+Sistema de comunicación en Redis
+Pub/Sub: los productores publican mensajes en un canal, y los consumidores que estén suscritos a ese canal los reciben automáticamente.
+
+SET: almacena elementos sin duplicados.
+LIST: mantiene el orden de inserción, permitiendo acceder a los elementos por índice.
+
+En este caso, Redis tiene comunicación indirecta, ya que los productores y consumidores no se comunican directamente entre sí. En su lugar, utilizan Redis como intermediario para enviar y recibir mensajes, a traves de canales pub/sub, listas y colas compartidas.
+
 
 ### InsultServer
+Este proyecto implementa un servicio de difusión de insultos utilizando Redis como sistema de comunicación. Está compuesto por varios módulos que colaboran de forma asíncrona:
+
+Componentes
+InsultProducer -> Genera un insulto aleatorio cada 5 segundos y lo publica en el canal INSULTS_input.
+
+InsultService/observable -> Escucha el canal INSULTS_input:
+- Si el insulto es nuevo (no duplicado), lo guarda en un SET y lo añade a una LIST para mantener el orden.
+- Cada 5 segundos, selecciona un insulto aleatorio de la lista y lo publica en el canal INSULTS_broadcast.
+
+InsultObserver -> Se suscribe al canal INSULTS_broadcast y muestra los insultos recibidos.
 
 ### InsultFilter
+En el caso del InsultFilter, el productor envía frases al servidor Redis, que las almacena en una lista. El servidor Redis actúa como intermediario entre el productor y el consumidor. El consumidor se suscribe a la lista y recibe las frases que el productor envía.
+Usa el metodo de pub/sub de Redis para recibir los mensajes. El servidor Redis se encarga de enrutar los mensajes desde el productor hasta el consumidor adecuado, permitiendo una comunicación asíncrona y desacoplada entre ellos.
+
+Se basa en el patron de work queue. 
+
+Componentes:
+- TextProducer: Envía frases sin insultos cada 5 segundos. Ayuda a probar el filtrado cuando no hay contenido ofensivo.
+- AngryProducer: Envía frases con insultos de forma aleatoria. Permite probar la efectividad del filtro.
+- InsultConsumer: Escucha la cola work_queue y procesa los textos que recibe y los reemplaza por "CENSORED" en caso de que contengan insultos. Almacena tanto el texto original como el filtrado en un SET y una LIST para mantener el orden de inserción.
 
 ## RabbitMQ
 En el caso de RabbitMQ, se tarta de un servicio de comunicación indirecta. Se basa en el modelo publisher-subscriber, donde los productores envían mensajes a un intercambio (exchange) y los consumidores se suscriben a colas (queues) que reciben esos mensajes. RabbitMQ se encarga de enrutar los mensajes desde el productor hasta el consumidor adecuado, permitiendo una comunicación asíncrona y desacoplada entre ellos.
