@@ -54,4 +54,4 @@ class TestXMLRPC:
 
 if __name__ == "__main__":
     tester = TestXMLRPC()
-    tester.run_all()
+    tester.run_all() 
