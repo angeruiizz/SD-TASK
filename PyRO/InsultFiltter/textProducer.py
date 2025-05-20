@@ -14,5 +14,5 @@ insult_filter = Pyro4.Proxy("PYRONAME:example.insult_filter")
 while True:
     for text in texts:
         print(f"TextProducer: Sending - {text}")
-        insult_filter.submit_text(text)
+        insult_filter.enqueue_text(text)
         time.sleep(5)

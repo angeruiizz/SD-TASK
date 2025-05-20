@@ -1,4 +1,4 @@
-# execInsultServer.py : Lanza Name Server + los 3 componentes Pyro en terminales separadas
+# execInsultServer.py : Lanza Name Server + los 4 componentes Pyro en terminales separadas
 
 import os
 import time
@@ -9,9 +9,10 @@ time.sleep(2)  # Esperar un poco más para asegurarse de que arranca
 
 # Scripts que se ejecutan
 scripts = {
-    "insultConsumer": "insultConsumer.py",
-    "angryProducer": "angryProducer.py",
-    "textProducer": "textProducer.py"
+    "Server": "server.py",
+    "AngryProducer": "angryProducer.py",
+    "TextProducer": "textProducer.py",
+    "Worker": "worker.py"
 }
 
 # Ejecutar los scripts en nuevas ventanas de terminal

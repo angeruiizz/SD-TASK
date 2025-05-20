@@ -18,5 +18,5 @@ insult_filter = Pyro4.Proxy("PYRONAME:example.insult_filter")
 while True:
     text = random.choice(texts)
     print(f"AngryProducer: Sending - {text}")
-    insult_filter.submit_text(text)
+    insult_filter.enqueue_text(text)
     time.sleep(3)

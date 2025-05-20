@@ -6,13 +6,13 @@ def check_or_start_redis():
     try:
         client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
         client.ping()
-        print("✅ Redis ya está en ejecución.")
+        print("Redis ya está en ejecución.")
     except redis.exceptions.ConnectionError:
-        print("⚠️ Redis no está en ejecución. Intentando lanzarlo con Docker...")
+        print("Redis no está en ejecución. Intentando lanzarlo con Docker...")
         os.system("docker rm -f insult_redis >nul 2>&1")  # Elimina contenedor anterior si existe
         os.system("docker run -d --name insult_redis -p 6379:6379 redis")
         time.sleep(2)  # Espera a que arranque
-        print("✅ Redis lanzado correctamente.")
+        print("Redis lanzado correctamente.")
 
 check_or_start_redis()
 
