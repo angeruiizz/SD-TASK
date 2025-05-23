@@ -7,6 +7,7 @@ scripts = {
     "Server": "insultConsumer.py",
     "ProducerText": "textProducer.py",
     "ProducerWInsults": "insultProducer.py",
+    "Worker": "worker.py"   # <--- ¡AÑADE EL WORKER!
 }
 
 # Ejecutar cada script en una nueva ventana de terminal (cmd)

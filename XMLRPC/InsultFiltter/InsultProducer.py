@@ -17,7 +17,7 @@ textos = [
 
 while True:
     text = random.choice(textos) #selecciona un texto aleatorio
-    response = server.add_text(text) #envia el insulto al servidor
+    response = server.enqueue_text(text) #envia el insulto al servidor
     print(response)
     time.sleep(5) #espera 5 segundos antes de enviar el siguiente insulto
 

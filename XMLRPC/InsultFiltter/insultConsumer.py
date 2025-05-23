@@ -1,68 +1,33 @@
 from xmlrpc.server import SimpleXMLRPCServer
-import time
-import random
 
-INSULTS = ["Tonto", "cap de suro", "Inútil", "BocaChancla", "idiota", "estúpido", "imbécil", "gilipollas"]
-
-class InsultFiltter:
+class InsultFilter:
     def __init__(self):
-        self.texts = []
-        self.textsFilt = []
+        self.work_queue = []
+        self.results = []
 
-    def add_text(self, text):
-            if text not in self.texts:
-                self.texts.append(text)
-                # Check if the text contains any insults
-                if self.contains_insult(text):
-                    # Clean the text
-                    cleaned_text = self.clean_text(text)
-                    self.textsFilt.append(cleaned_text)
-                    print(f"Text contained insults. Filtered: {cleaned_text}")
-                    return f"Frase enviada: {text}"
-                else:
-                    self.textsFilt.append(text)
-                    print(f"Clean text added: {text}")
-                    return f"Frase enviada: {text}"
-            else:
-                 if self.contains_insult(text):
-                    cleaned_text = self.clean_text(text)
-                    print(f"Text already exists, filtered version: {cleaned_text}")
-                    return f"Already exists. Filtered text: {cleaned_text}"
-                 else:
-                    print(f"Text {text} already exists and is clean.")
-                    return f"Already exists. Clean text: {text}"
+    def enqueue_text(self, text):
+        self.work_queue.append(text)
+        print(f"Enqueued: {text}")
+        return "Text enqueued."
 
+    def get_next_text(self):
+        if self.work_queue:
+            text = self.work_queue.pop(0)
+            print(f"Dispatched to worker: {text}")
+            return text
+        else:
+            return None
 
-    def get_texts(self):
-        return self.texts
-    
-    def get_texts_filt(self):
-        return self.textsFilt
-    
-    def contains_insult(self, text):
-        for insult in INSULTS:
-            if insult in text:
-                return True
-        return False    
+    def submit_result(self, clean_text):
+        self.results.append(clean_text)
+        print(f"Result saved: {clean_text}")
+        return "Result saved."
 
-    #Remplaza les insultos por "CENSURADO"
-    def clean_text(self, text):
-        for insult in INSULTS:
-            text = text.replace(insult, "CENSORED")
-            text = text.replace(insult.lower(), "CENSORED")
-            text = text.replace(insult.capitalize(), "CENSORED")
-        return text
+    def get_results(self):
+        return self.results
 
-# Crear el servidor XML-RPC
 server = SimpleXMLRPCServer(("localhost", 9000), allow_none=True)
-server.register_introspection_functions()
-
-# Registrar el servicio
-service = InsultFiltter()
+service = InsultFilter()
 server.register_instance(service)
-
 print("Insult XML-RPC Server is running on port 9000...")
 server.serve_forever()
-
-# Dentro de la función add_text()
-print(f"Recibido texto: {text}")
