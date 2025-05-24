@@ -24,15 +24,13 @@ print("InsultService is running...")
 last_broadcast = time.time()
 
 while True:
-    message = pubsub.get_message(ignore_subscribe_messages=True)  
-    if message:
-        insult = message['data']
-        added = client.sadd(INSULT_SET, insult)
-        if added:
-            client.rpush(INSULT_LIST, insult)
-            print(f"[ADD] New insult added: {insult}")
-        else:
-            print(f"[SKIP] Duplicate insult ignored: {insult}")
+    _, insult = client.blpop("insults_queue")  # Espera bloqueante
+    added = client.sadd(INSULT_SET, insult)
+    if added:
+        client.rpush(INSULT_LIST, insult)
+        print(f"[ADD] New insult added: {insult}")
+    else:
+        print(f"[SKIP] Duplicate insult ignored: {insult}")
 
     #PARTE BROADCAST
     current_time = time.time()

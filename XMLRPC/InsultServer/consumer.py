@@ -1,6 +1,7 @@
-# consumer.py - servidor XML-RPC sin hilos
+# consumer.py - servidor XML-RPC con puerto configurable
 import random
 import time
+import sys
 from xmlrpc.server import SimpleXMLRPCServer
 
 class InsultServer:
@@ -35,10 +36,24 @@ class InsultServer:
             print(f"[Broadcasted] {insult}")
         return self.last_broadcasted
 
-server = SimpleXMLRPCServer(("localhost", 9000), allow_none=True)
-server.register_introspection_functions()
-service = InsultServer()
-server.register_instance(service)
+    def clear_insults(self):
+        self.insults.clear()
+        print("Insults list cleared.")
 
-print("Insult XML-RPC Server is running on port 9000...")
-server.serve_forever()
+if __name__ == "__main__":
+    # Leer puerto como argumento o usar 9000 por defecto
+    port = 9000
+    if len(sys.argv) > 1:
+        try:
+            port = int(sys.argv[1])
+        except:
+            print("Uso: python consumer.py [PUERTO]")
+            sys.exit(1)
+
+    server = SimpleXMLRPCServer(("localhost", port), allow_none=True)
+    server.register_introspection_functions()
+    service = InsultServer()
+    server.register_instance(service)
+
+    print(f"Insult XML-RPC Server is running on port {port}...")
+    server.serve_forever()

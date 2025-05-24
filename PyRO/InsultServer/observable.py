@@ -1,6 +1,7 @@
 import Pyro4
 import random
 import time
+import sys
 
 @Pyro4.expose
 @Pyro4.behavior(instance_mode="single")
@@ -39,12 +40,17 @@ class InsultService(object):
                 print("Error al notificar observer:", e)
 
 def main():
+    if len(sys.argv) < 2:
+        print("Uso: python observable.py <service_name>")
+        sys.exit(1)
+    service_name = sys.argv[1]
+
     daemon = Pyro4.Daemon()
     ns = Pyro4.locateNS()
     service = InsultService()
     uri = daemon.register(service)
-    ns.register("example.insultservice", uri)
-    print("InsultService corriendo...")
+    ns.register(service_name, uri) 
+    print(f"InsultService corriendo como {service_name}")
 
     # Bucle principal del servidor
     def loop_condition():
