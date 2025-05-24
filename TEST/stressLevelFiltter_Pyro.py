@@ -23,21 +23,17 @@ base_texts = [
     "De aquí poco es mi graduación"
 ]
 
-# 1. Lanzar el Name Server, server.py y los workers antes de este script
+
 num_workers = int(input("¿Cuántos workers tienes corriendo? (1, 2, 3, etc.): "))
 input("Lanza el Name Server (python -m Pyro4.naming), server.py y los worker.py en otras terminales y pulsa Enter aquí para continuar...")
 
-# Nota: No hay método para limpiar las colas en el servidor,
-# así que asegúrate de reiniciar el Name Server y server.py antes de cada test.
-
-# 2. Medir tiempo de envío de mensajes
 start = time.time()
 for i in range(N):
     text = base_texts[i % len(base_texts)]
     insult_filter.enqueue_text(text)
 end_send = time.time()
 
-# 3. Esperar a que todos los mensajes hayan sido procesados (vía get_results)
+
 print("Esperando a que todos los mensajes sean procesados...")
 while True:
     results = insult_filter.get_results()
@@ -53,9 +49,10 @@ processing_time = end - end_send
 req_per_sec = N / total_time
 t_media = (total_time / N) * 1000  # ms
 
-csv_file = 'stress_insultfiltter_pyro.csv'
+csv_file = 'stress_insultfiltter.csv'
 write_header = not os.path.isfile(csv_file) or os.path.getsize(csv_file) == 0
 
+#escribir resultados en CSV
 with open(csv_file, 'a', newline='') as f:
     writer = csv.writer(f)
     if write_header:

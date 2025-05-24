@@ -19,9 +19,6 @@ def callback(ch, method, properties, body):
     else:
         print(f"[=] Insulto duplicado ignorado: {insult}")
 
-    # Simula tiempo de procesamiento
-    time.sleep(1)
-
     # Confirma que se ha procesado correctamente
     ch.basic_ack(delivery_tag=method.delivery_tag)
 

@@ -13,4 +13,4 @@ while True:
     insult = random.choice(INSULTS)
     client.publish(INPUT_CHANNEL, insult)
     print(f"Produced insult: {insult}")
-    time.sleep(5)  # Emite un insulto cada 5 segundos
+    

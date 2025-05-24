@@ -24,8 +24,7 @@ print("InsultService is running...")
 last_broadcast = time.time()
 
 while True:
-    # 1. Revisar si llega algún insulto nuevo
-    message = pubsub.get_message(ignore_subscribe_messages=True)  # <<< IGNORA el mensaje de suscripción
+    message = pubsub.get_message(ignore_subscribe_messages=True)  
     if message:
         insult = message['data']
         added = client.sadd(INSULT_SET, insult)
@@ -35,7 +34,7 @@ while True:
         else:
             print(f"[SKIP] Duplicate insult ignored: {insult}")
 
-    # 2. Hacer broadcast cada 5 segundos
+    #PARTE BROADCAST
     current_time = time.time()
     if current_time - last_broadcast >= 5:
         insults = client.lrange(INSULT_LIST, 0, -1)
@@ -46,5 +45,3 @@ while True:
         else:
             print("[BROADCAST] No insults to send yet.")
         last_broadcast = current_time
-
-    time.sleep(0.1)  # Pequeño delay para no saturar la CPU

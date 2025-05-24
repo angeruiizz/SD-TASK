@@ -24,7 +24,7 @@ base_texts = [
 num_workers = int(input("¿Cuántos workers tienes corriendo? (1, 2, 3, etc.): "))
 input("Lanza los workers.py en otras terminales y pulsa Enter aquí para continuar...")
 
-# Limpieza de colas (opcional: elimina todos los mensajes antiguos de la cola de resultados)
+#limpiar colas por si acaso
 def clean_queue(channel, queue_name):
     channel.queue_declare(queue=queue_name)
     channel.queue_purge(queue=queue_name)
@@ -34,18 +34,16 @@ channel = connection.channel()
 clean_queue(channel, text_queue)
 clean_queue(channel, result_queue)
 
-# 1. Medir tiempo de envío de mensajes
 start = time.time()
 for i in range(N):
-    text = base_texts[i % len(base_texts)]
-    channel.basic_publish(exchange='', routing_key=text_queue, body=text)
+    text = base_texts[i % len(base_texts)] #seleccion de texto
+    channel.basic_publish(exchange='', routing_key=text_queue, body=text) #publicamos el mensaje
 end_send = time.time()
 
-# 2. Esperar a que todos los mensajes sean procesados (leyendo result_queue)
 print("Esperando a que todos los mensajes sean procesados...")
 connection_result = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 channel_result = connection_result.channel()
-channel_result.queue_declare(queue=result_queue)
+channel_result.queue_declare(queue=result_queue) 
 
 def get_result_count():
     return channel_result.queue_declare(queue=result_queue, passive=True).method.message_count
@@ -61,9 +59,10 @@ processing_time = end - end_send
 req_per_sec = N / total_time
 t_media = (total_time / N) * 1000  # ms
 
-csv_file = 'stress_insultfiltter_rabbitmq.csv'
+csv_file = 'stress_insultfiltter.csv'
 write_header = not os.path.isfile(csv_file) or os.path.getsize(csv_file) == 0
 
+#escribir resultados en CSV
 with open(csv_file, 'a', newline='') as f:
     writer = csv.writer(f)
     if write_header:

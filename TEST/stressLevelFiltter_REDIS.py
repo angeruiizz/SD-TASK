@@ -4,7 +4,6 @@ import csv
 import os
 
 num_mensajes = int(input("¿Cuántos mensjaes enviamos para la prueba de stress?"))
-
 N = num_mensajes  # Número de mensajes a enviar
 
 client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
@@ -27,18 +26,15 @@ base_texts = [
     "De aquí poco es mi graduación"
 ]
 
-# 1. Lanzar el worker antes de este script (importante)
 num_workers = int(input("¿Cuántos workers tienes corriendo? (1, 2, 3, etc.): "))
 input("Lanza los workers.py en otras terminales y pulsa Enter aquí para continuar...")
 
-# 2. Medir tiempo de envío de mensajes
 start = time.time()
 for i in range(N):
     text = base_texts[i % len(base_texts)]
     client.rpush(work_queue, text)
 end_send = time.time()
 
-# 3. Esperar a que todos los mensajes hayan sido procesados
 print("Esperando a que todos los mensajes sean procesados...")
 while client.llen(results_list) < N:
     time.sleep(0.1)
@@ -51,7 +47,7 @@ processing_time = end - end_send
 req_per_sec = N / total_time
 t_media = (total_time / N) * 1000  # ms
 
-csv_file = 'stress_insultfiltter_redis.csv'
+csv_file = 'stress_insultfiltter.csv'
 write_header = not os.path.isfile(csv_file) or os.path.getsize(csv_file) == 0
 
 with open(csv_file, 'a', newline='') as f:

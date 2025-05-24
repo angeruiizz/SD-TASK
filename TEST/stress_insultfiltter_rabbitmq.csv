@@ -1,2 +1,0 @@
-sistema,servicio,n_peticiones,workers,tiempo_total,req/s,t_media
-RabbitMQ,InsultFilter,500,1,0.3858356475830078,1295.8885554825029,0.7716712951660156

@@ -1,2 +1,0 @@
-sistema,servicio,n_peticiones,workers,tiempo_total,req/s,t_media
-XMLRPC,InsultFilter,500,1,5550.367071151733,0.09008413202052366,11100.734142303467
