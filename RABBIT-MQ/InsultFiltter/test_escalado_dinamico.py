@@ -2,7 +2,7 @@ import subprocess
 import time
 import pika
 
-def stress_producer(queue_name='text_queue', burst_duration=40, slow_duration=5, messages_per_sec_fast=100000, 
+def stress_producer(queue_name='text_queue', burst_duration=40, slow_duration=5, messages_per_sec_fast=10000, 
                     messages_per_sec_slow=2):
     connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     channel = connection.channel()
