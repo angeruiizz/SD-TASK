@@ -24,6 +24,5 @@ while True:
         properties=pika.BasicProperties(delivery_mode= pika.DeliveryMode.Persistent) 
     )
     print(f"[x] Enviado: {insult}")
-    time.sleep(5)  # Espera 5 segundo entre mensajes
 
 connection.close()

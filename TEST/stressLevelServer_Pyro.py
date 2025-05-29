@@ -31,6 +31,13 @@ for i in range(N):
     service.add_insult(insult)
 end = time.time()
 
+print("Esperando a que todos los mensajes sean procesados...")
+while True:
+    results = service.get_results()
+    if len(results) >= N:
+        break
+    time.sleep(0.1)
+
 total_time = end - start
 req_per_sec = N / total_time
 t_media = (total_time / N) * 1000  # ms

@@ -3,9 +3,8 @@ import time
 import subprocess
 
 MIN_WORKERS = 1
-MAX_WORKERS = 10
-UPPER_THRESHOLD = 10
-LOWER_THRESHOLD = 1
+MAX_WORKERS = 20
+TARGET_RESPONSE_TIME = 2  # Segundos objetivo para vaciar la cola
 WORKER_SCRIPT = "worker.py"
 
 def get_queue_length(queue_name='text_queue'):
@@ -17,7 +16,6 @@ def get_queue_length(queue_name='text_queue'):
     return message_count
 
 def launch_worker():
-    # Lanza el worker y devuelve el objeto proceso real
     return subprocess.Popen(["python", WORKER_SCRIPT])
 
 def main():
@@ -29,21 +27,26 @@ def main():
     try:
         while True:
             queue_len = get_queue_length()
-            print(f"Mensajes en cola: {queue_len} | Workers activos: {len(workers)}")
+            # Calcula el número recomendado de workers usando backlog / tiempo objetivo
+            workers_needed = max(MIN_WORKERS, min(MAX_WORKERS, int(queue_len / TARGET_RESPONSE_TIME)))
+            current_workers = len(workers)
 
             # Escalar
-            if queue_len > UPPER_THRESHOLD and len(workers) < MAX_WORKERS:
-                print("Escalando: lanzando un nuevo worker.")
-                p = launch_worker()
-                workers.append(p)
-
+            if workers_needed > current_workers:
+                for _ in range(workers_needed - current_workers):
+                    print("Escalando: lanzando un nuevo worker.")
+                    p = launch_worker()
+                    workers.append(p)
             # Desescalar
-            elif queue_len < LOWER_THRESHOLD and len(workers) > MIN_WORKERS:
-                print("Reduciendo: parando un worker.")
-                p = workers.pop()
-                p.terminate()
-                p.wait()
-            time.sleep(1)
+            elif workers_needed < current_workers:
+                for _ in range(current_workers - workers_needed):
+                    if len(workers) > MIN_WORKERS:
+                        print("Reduciendo: parando un worker.")
+                        p = workers.pop()
+                        p.terminate()
+                        p.wait()
+            print(f"Mensajes en cola: {queue_len} | Workers activos: {len(workers)} | Workers recomendados: {workers_needed}")
+            time.sleep(0.1)
 
     except KeyboardInterrupt:
         print("Terminando supervisor y todos los workers...")

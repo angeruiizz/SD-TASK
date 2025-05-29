@@ -26,8 +26,10 @@ last_broadcast = time.time()
 while True:
     _, insult = client.blpop("insults_queue")  # Espera bloqueante
     added = client.sadd(INSULT_SET, insult)
+    client.rpush("insults_processed", insult)
     if added:
         client.rpush(INSULT_LIST, insult)
+        client.rpush("insults_processed", insult)
         print(f"[ADD] New insult added: {insult}")
     else:
         print(f"[SKIP] Duplicate insult ignored: {insult}")

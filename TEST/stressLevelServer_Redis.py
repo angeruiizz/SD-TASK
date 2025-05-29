@@ -25,8 +25,13 @@ for i in range(N):
     client.rpush("insults_queue", insult)
 end_send = time.time()
 
-# 2. Espera a que se procesen todos (es decir, que todos estén en el set/lista)
-print("Esperando a que todos los insultos hayan sido procesados y guardados en el set...")
+print("Esperando a que todos los insultos hayan sido procesados...")
+
+while True:
+    processed = client.llen("insults_processed") 
+    if processed >= N:
+        break
+    time.sleep(0.1)
 
 end = time.time()
 total_time = end - start

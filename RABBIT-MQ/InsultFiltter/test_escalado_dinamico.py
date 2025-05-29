@@ -1,25 +1,18 @@
-import subprocess
-import time
 import pika
+import time
 
-def stress_producer(queue_name='text_queue', burst_duration=40, slow_duration=5, messages_per_sec_fast=10000, 
-                    messages_per_sec_slow=2):
+def burst_producer(queue_name='text_queue', n_messages=1000000):
     connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     channel = connection.channel()
     channel.queue_declare(queue=queue_name)
-    print("=== [PRODUCER] Inicio de carga alta (burst) ===")
+    print(f"=== [PRODUCER] Enviando {n_messages} mensajes de golpe ===")
     start = time.time()
-    while time.time() - start < burst_duration:
-        channel.basic_publish(exchange='', routing_key=queue_name, body='TEST_MESSAGE')
-        time.sleep(1 / messages_per_sec_fast)
-    print("=== [PRODUCER] Inicio de carga baja ===")
-    start = time.time()
-    while time.time() - start < slow_duration:
-        channel.basic_publish(exchange='', routing_key=queue_name, body='TEST_MESSAGE')
-        time.sleep(1 / messages_per_sec_slow)
-    print("=== [PRODUCER] Productor de stress terminado ===")
+    for i in range(n_messages):
+        channel.basic_publish(exchange='', routing_key=queue_name, body=f'TEST_MESSAGE {i}')
+    end = time.time()
+    print(f"=== [PRODUCER] Burst enviado en {end - start:.2f} segundos ===")
     connection.close()
 
 if __name__ == "__main__":
-    stress_producer()
-    print("Test de escalado dinámico finalizado.")
+    burst_producer(n_messages=20000)  # Puedes probar con 50000 o más si tu RAM y CPU lo permiten
+    print("Burst test finalizado.")

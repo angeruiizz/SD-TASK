@@ -28,8 +28,7 @@ def callback(ch, method, properties, body):
     # Enviar a la cola de resultados
     channel_result.basic_publish(exchange='', routing_key='result_queue', body=cleaned)
     ch.basic_ack(delivery_tag=method.delivery_tag)
-    sleep(1)
 
-print(" [*] Esperando textos para filtrar...")
+#print(" [*] Esperando textos para filtrar...")
 channel.basic_consume(queue='text_queue', on_message_callback=callback, auto_ack=False)
 channel.start_consuming()
