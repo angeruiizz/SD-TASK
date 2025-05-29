@@ -6,6 +6,8 @@ import os
 N = int(input("¿Cuántos insultos quieres enviar en la prueba de stress? "))
 num_services = int(input("¿Cuántas instancias de InsultService quieres utilizar? "))
 
+
+
 INSULTS = [
     "Tonto", "Cap de suro", "Inútil", "BocaChancla", "Cabezón",
     "Papanatas", "Bobalicón", "Cretino", "Lelo", "Bocazas", "QUEPASABALA"
@@ -33,8 +35,8 @@ end = time.time()
 
 print("Esperando a que todos los mensajes sean procesados...")
 while True:
-    results = service.get_results()
-    if len(results) >= N:
+    total_count = sum([s.get_add_count() for s in services])
+    if total_count >= N:
         break
     time.sleep(0.1)
 

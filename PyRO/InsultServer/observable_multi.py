@@ -10,10 +10,12 @@ def launch_pyro_server(service_name):
     class InsultService(object):
         def __init__(self):
             self.insults = []
+            self.add_count = 0
             self.observers = []
             self.last_broadcast = time.time()
 
         def add_insult(self, insult):
+            self.add_count += 1
             if insult not in self.insults:
                 self.insults.append(insult)
                 print(f"Insulto añadido: {insult}")
@@ -25,6 +27,7 @@ def launch_pyro_server(service_name):
             return self.insults
 
         def clear_insults(self):
+            self.add_count = 0
             self.insults.clear()
             print("Lista de insultos limpiada.")
 
@@ -43,6 +46,8 @@ def launch_pyro_server(service_name):
                     obs_proxy.update(insult)
                 except Exception as e:
                     print("Error al notificar observer:", e)
+        def get_add_count(self):
+            return self.add_count
 
     daemon = Pyro4.Daemon()
     ns = Pyro4.locateNS()
